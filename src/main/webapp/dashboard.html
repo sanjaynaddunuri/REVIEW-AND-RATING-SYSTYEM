@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Review and Rating System</title>
+  <style>
+    /* Root variables for consistent theming */
+    :root {
+      --primary-color: #f39c12;
+      --secondary-color: #e74c3c;
+      --accent-color: #2ecc71;
+      --text-color-light: #f5f6fa;
+      --text-color-dark: #333;
+      --bg-light: #f4f4f9;
+      --bg-dark: #1e1e2f;
+      --sidebar-bg-start: #2c2c3c;
+      --sidebar-bg-end: #1e1e2f;
+      --card-bg-light: #fff;
+      --card-bg-dark: #333;
+      --shadow-color: rgba(0, 0, 0, 0.15);
+      --transition-duration: 0.3s;
+      --font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Dark mode theme */
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-color-light);
+    }
+    body.dark-mode .sidebar {
+      background: linear-gradient(180deg, var(--sidebar-bg-end), var(--sidebar-bg-start));
+      color: var(--text-color-light);
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode .sidebar h2 {
+      color: var(--primary-color);
+    }
+    body.dark-mode .menu a {
+      color: var(--text-color-light);
+    }
+    body.dark-mode .menu a:hover,
+    body.dark-mode .menu a.active {
+      background: linear-gradient(90deg, #444, #2c2c3c);
+      color: var(--accent-color);
+    }
+    body.dark-mode .logout {
+      background: var(--secondary-color);
+    }
+    body.dark-mode .main {
+      color: var(--text-color-light);
+    }
+    body.dark-mode .header h1 {
+      color: var(--text-color-light);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    body.dark-mode form {
+      background: var(--card-bg-dark);
+      color: var(--text-color-light);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode form input,
+    body.dark-mode form select,
+    body.dark-mode form textarea {
+      background-color: #444;
+      color: var(--text-color-light);
+      border-color: #666;
+    }
+    body.dark-mode .product-card {
+      background-color: var(--card-bg-dark);
+      color: var(--text-color-light);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    body.dark-mode table {
+      background-color: #2c2c3c;
+      color: var(--text-color-light);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    body.dark-mode th {
+      background-color: var(--primary-color);
+    }
+    body.dark-mode .settings-card {
+      background-color: var(--card-bg-dark);
+      color: var(--text-color-light);
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .settings-card input[type="text"],
+    body.dark-mode .settings-card input[type="password"],
+    body.dark-mode .settings-card select,
+    body.dark-mode .settings-card input[type="range"] {
+      background-color: #444;
+      color: var(--text-color-light);
+      border-color: #666;
+    }
+    body.dark-mode .settings-dropdown {
+      background-color: var(--card-bg-dark);
+      color: var(--text-color-light);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .dropdown-header {
+      background: linear-gradient(90deg, #3a3a3a, #2c2c2c);
+      color: var(--text-color-light);
+    }
+    body.dark-mode .dropdown-body {
+      background-color: #333;
+      color: var(--text-color-light);
+    }
+
+    /* Base styles */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-light);
+      color: var(--text-color-dark);
+      transition: background-color var(--transition-duration), color var(--transition-duration);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px; /* Slightly wider sidebar */
+      background: linear-gradient(180deg, var(--sidebar-bg-start), var(--sidebar-bg-end));
+      color: var(--text-color-light);
+      display: flex;
+      flex-direction: column;
+      padding-top: 30px; /* More top padding */
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+      transition: background var(--transition-duration);
+      z-index: 10; /* Ensure sidebar is above main content */
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 40px; /* More margin below title */
+      color: var(--primary-color);
+      font-size: 2em; /* Larger title */
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .menu a {
+      padding: 18px 30px; /* Larger padding for links */
+      display: block;
+      color: var(--text-color-light);
+      text-decoration: none;
+      font-weight: 500; /* Slightly lighter font weight */
+      transition: all var(--transition-duration) ease-in-out;
+      border-left: 5px solid transparent; /* Thicker active/hover indicator */
+      position: relative;
+      overflow: hidden; /* For the slide-in effect */
+    }
+    .menu a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 5px;
+      background: var(--primary-color);
+      transform: scaleY(0);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* More dynamic transition */
+      transform-origin: bottom;
+    }
+    .menu a:hover::before,
+    .menu a.active::before {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    .menu a:hover {
+      background: rgba(255, 255, 255, 0.05);
+      padding-left: 35px; /* More indentation on hover */
+      letter-spacing: 0.8px;
+      transform: translateX(3px); /* Subtle movement on hover */
+    }
+    .menu a.active {
+      background: rgba(var(--primary-color-rgb), 0.1); /* Active state background */
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .logout {
+      margin-top: auto;
+      text-align: center;
+      padding: 20px; /* More padding for logout */
+      background: var(--secondary-color);
+      color: var(--text-color-light);
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: background var(--transition-duration), transform var(--transition-duration) ease-in-out;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .logout:hover {
+      background: #c0392b; /* Darker shade on hover */
+      transform: translateY(-2px); /* Subtle lift on hover */
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 40px; /* More padding for main content */
+      overflow-y: auto;
+      animation: fadeSlide 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative; /* For toggle button positioning */
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header in Main Content */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px; /* More margin below header */
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    }
+    .header h1 {
+      font-size: 2.5em; /* Larger heading */
+      color: var(--primary-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .toggle-container {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-container input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--primary-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .toggle-label {
+      margin-left: 10px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: inherit; /* Inherit text color from body */
+    }
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Review Form */
+    form {
+      margin-top: 30px;
+      background: var(--card-bg-light);
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      box-shadow: 0 8px 20px var(--shadow-color);
+    }
+    form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: inherit;
+    }
+    form input,
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      transition: border-color var(--transition-duration);
+    }
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 5px rgba(var(--primary-color-rgb), 0.5);
+    }
+    form button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: var(--accent-color);
+      color: var(--text-color-light);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1em;
+      transition: background-color var(--transition-duration), transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      box-shadow: 0 4px 8px rgba(var(--accent-color-rgb), 0.3);
+    }
+    form button:hover {
+      background: #218838; /* Darker shade of accent color */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(var(--accent-color-rgb), 0.4);
+    }
+    form button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(var(--accent-color-rgb), 0.4);
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+      padding: 25px;
+    }
+
+    .product-card {
+      background: var(--card-bg-light);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 6px 15px var(--shadow-color);
+      transition: transform var(--transition-duration) ease-in-out, box-shadow var(--transition-duration) ease-in-out;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .product-name {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: inherit;
+      line-height: 1.3;
+      min-height: 50px; /* Ensure consistent height for product names */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .price {
+      color: var(--secondary-color);
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 8px;
+    }
+    .stars {
+      color: #ffc107; /* Gold color for stars */
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+    .btns {
+      display: flex;
+      justify-content: space-around; /* Space out the buttons */
+      align-items: center;
+      margin-top: 15px;
+    }
+    .cart-btn,
+    .review-btn {
+      padding: 10px 18px;
+      font-size: 0.9em;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color var(--transition-duration), transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      white-space: nowrap; /* Prevent text wrapping */
+    }
+    .cart-btn {
+      background-color: #007bff; /* Blue */
+      color: var(--text-color-light);
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+    .cart-btn:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+    }
+    .review-btn {
+      background-color: var(--accent-color); /* Green */
+      color: var(--text-color-light);
+      box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    .review-btn:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+    }
+
+    /* User Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      border-radius: 12px;
+      overflow: hidden; /* For rounded corners on background */
+      background-color: var(--card-bg-light);
+    }
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: var(--primary-color);
+      color: var(--text-color-light);
+      font-weight: bold;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    td:first-child {
+      border-radius: 12px 0 0 0; /* Top-left rounded */
+    }
+    td:last-child {
+      border-radius: 0 12px 0 0; /* Top-right rounded */
+    }
+    tr:last-child td:first-child {
+      border-radius: 0 0 0 12px; /* Bottom-left rounded */
+    }
+    tr:last-child td:last-child {
+      border-radius: 0 0 12px 0; /* Bottom-right rounded */
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      white-space: nowrap;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    /* Action Buttons in Table */
+    .action-btn {
+      padding: 8px 16px;
+      margin-right: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .edit {
+      background-color: #3498db;
+      color: var(--text-color-light);
+      box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5);
+    }
+    .edit:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.6);
+    }
+    .delete {
+      background-color: var(--secondary-color);
+      color: var(--text-color-light);
+      box-shadow: 0 2px 5px rgba(231, 76, 60, 0.5);
+    }
+    .delete:hover {
+      background-color: #c0392b;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(231, 76, 60, 0.6);
+    }
+
+    /* Settings Dropdown */
+    .settings-container {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      padding: 25px;
+    }
+    .settings-dropdown {
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 6px 15px var(--shadow-color);
+      transition: all var(--transition-duration) ease-in-out;
+      background: var(--card-bg-light);
+    }
+    .dropdown-header {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.1em;
+      background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background var(--transition-duration) ease-in-out, color var(--transition-duration);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dropdown-header:hover {
+      background: linear-gradient(90deg, #e2e6ea, #dee2e6);
+      color: var(--primary-color);
+    }
+    .dropdown-header.active {
+      color: var(--primary-color);
+    }
+    .dropdown-body {
+      padding: 0 18px;
+      background: var(--card-bg-light);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out;
+    }
+    .dropdown-body label {
+      display: block;
+      margin: 12px 0;
+      color: inherit;
+      font-weight: 500;
+    }
+    .animated-btn {
+      background: var(--primary-color);
+      color: var(--text-color-light);
+      padding: 12px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.4);
+    }
+    .animated-btn:hover {
+      background: #d88c0c; /* Darker shade */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(var(--primary-color-rgb), 0.5);
+    }
+
+    /* Fade In Animation */
+    .fade-in {
+      animation: fadeInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes fadeInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .card {
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+}
+
+.glass-effect {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+  .loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  .menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.1);
+  transform: skewX(-30deg);
+  transition: 0.5s;
+}
+
+.menu-item:hover:before {
+  left: 100%;
+}
+  body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+  .panel {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  .nav-item {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+.nav-item:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: #4A90E2;
+  transition: width 0.3s ease;
+}
+
+.nav-item:hover:after {
+  width: 100%;
+}
+    
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <h2>Dashboard</h2>
+    <div class="menu">
+      <a href="#" onclick="showPage('dashboard')" class="active" data-page="dashboard">Dashboard</a>
+      <a href="#" onclick="showPage('reviews')" data-page="reviews">Reviews</a>
+      <a href="#" onclick="showPage('products')" data-page="products">Products</a>
+      <a href="#" onclick="showPage('users')" data-page="users">Users</a>
+      <a href="#" onclick="showPage('settings')" data-page="settings">Settings</a>
+      <a href="#" onclick="showPage('admin')" data-page="admin">Admin</a>
+    </div>
+    <div class="logout" onclick="logout()">Logout</div>
+  </div>
+
+  <div class="main" id="main-content">
+    <div class="header">
+      <h1>Welcome to Product Review and Rating System</h1>
+      <div class="theme-toggle">
+        <label class="toggle-container">
+          <input type="checkbox" id="theme-toggle-checkbox">
+          <span class="slider round"></span>
+        </label>
+        <span class="toggle-label">Dark Mode</span>
+      </div>
+    </div>
+    <p>Select a menu item from the left to get started.</p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const themeToggleCheckbox = document.getElementById("theme-toggle-checkbox");
+      const currentTheme = localStorage.getItem("theme") || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+      if (currentTheme === 'dark') {
+        document.body.classList.add("dark-mode");
+        themeToggleCheckbox.checked = true;
+      }
+
+      themeToggleCheckbox.addEventListener("change", function() {
+        document.body.classList.toggle("dark-mode", this.checked);
+        localStorage.setItem("theme", this.checked ? 'dark' : 'light');
+      });
+
+      loadPage('dashboard'); // Load default section
+    });
+
+    function generateUserRow(name, role, imageUrl) {
+      return `
+        <tr style="transition: background 0.3s;">
+          <td style="padding: 12px; text-align: center;">
+            <div class="tooltip">
+              <img src="${imageUrl}" width="50" height="50" style="border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.2);" />
+              <span class="tooltiptext">${name} - ${role}</span>
+            </div>
+          </td>
+          <td style="padding: 12px;">${name}</td>
+          <td style="padding: 12px;">${role}</td>
+          <td style="padding: 12px;">
+            <button onclick="editUser('${name}')" class="action-btn edit">Edit</button>
+            <button onclick="deleteUser('${name}')" class="action-btn delete">Delete</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function logout() {
+      window.location.href = "login.html";
+    }
+
+    function showPage(page) {
+      document.querySelectorAll('.menu a').forEach(el => el.classList.remove('active'));
+      const activeLink = document.querySelector(`.menu a[data-page="${page}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+      const content = document.getElementById("main-content");
+      content.classList.add("fadeIn");
+      content.innerHTML = ''; // Clear previous content
+
+      if (page === 'dashboard') {
+        content.innerHTML = `
+          <div class="header">
+            <h1>Dashboard Overview</h1>
+          </div>
+          <p>Total Products: 24 | Total Reviews: 130 | Avg. Rating: 4.5 | Users: 12</p>
+        `;
+      } else if (page === 'reviews') {
+        content.innerHTML = `
+          <div class="header">
+            <h1>Submit a Product Review</h1>
+          </div>
+          <form id="reviewForm" method="POST" action="rev">
+            <label for="product">Choose a Product:</label>
+            <select id="product" name="product">
+              <option value="iphone14">iPhone 14 Pro</option>
+              <option value="samsungS22">Samsung Galaxy S22</option>
+              <option value="oneplus11">OnePlus 11</option>
+              <option value="pixel7">Google Pixel 7</option>
+              <option value="Micromax 32">Micromax 32</option>
+              <option value="Redmi Note 4">Redmi Note 4</option>
+              <option value="Lenovo K6 Power">Lenovo K6 Power</option>
+              <option value="Micromax Canvas Mega 4G">Micromax Canvas Mega 4G</option>
+            </select>
+
+            <label for="rating">Rating (1-5):</label>
+            <input type="number" id="rating" name="rating" min="1" max="5" required />
+
+            <label for="review">Your Review:</label>
+            <textarea id="review" name="review" rows="4" required></textarea>
+
+            <button type="submit">Submit Review</button>
+          </form>
+        `;
+      } else if (page === 'products') {
+        content.innerHTML = `
+          <div class="header">
+            <h1>Product List</h1>
+          </div>
+          <div class="product-grid">
+            ${[
+              {
+                name: "Micromax 32\" LED TV",
+                price: "₹13,990",
+                rating: 3,
+                image: "https://cdn1.smartprix.com/rx-iVhh2v4D6-w1200-h1200/Vhh2v4D6.jpg"
+              },
+              {
+                name: "Apple iPhone 6 (16GB)",
+                price: "₹36,990",
+                rating: 4,
+                image: "https://th.bing.com/th/id/OIP.szzfeadwC2CpV3l0UHw6bAHaJ4?rs=1&pid=ImgDetMain"
+              },
+              {
+                name: "Redmi Note 4 (3GB RAM)",
+                price: "₹10,999",
+                rating: 4,
+                image: "https://m.media-amazon.com/images/I/61xACsO99ML._SL1280_.jpg"
+              },
+              {
+                name: "Lenovo K6 Power (32GB)",
+                price: "₹9,999",
+                rating: 4,
+                image: "https://cdn.shopclues.com/images/thumbnails/81665/320/320/135568238-81665563-1522235380.jpg"
+              },
+              {
+                name: "Lenovo Vibe K5 Note (32GB)",
+                price: "₹11,999",
+                rating: 4,
+                image: "https://th.bing.com/th/id/OIP.Q1EFWkcw22BBuHLrKwk7twHaHa?rs=1&pid=ImgDetMain"
+              },
+              {
+                name: "Micromax Canvas Mega 4G",
+                price: "₹6,999",
+                rating: 4,
+                image: "https://th.bing.com/th/id/R.e822b9a0daa55c9ae75b82b8895e3bbb?rik=XyaCMdRInlJl7A&riu=http%3a%2f%2fcdn.ndtv.com%2ftech%2fmicromax_canvas_pulse_4g.jpg&ehk=9SQrOZugBDe%2bIlPECNNfVltaOycx4GiqaAbe0uhoml4%3d&risl=&pid=ImgRaw&r=0"
+              }
+            ].map(product => `
+              <div class="product-card">
+                <img src="${product.image}" alt="${product.name}" />
+                <h3 class="product-name">${product.name}</h3>
+                <p class="price">${product.price}</p>
+                <p class="stars">${'⭐'.repeat(product.rating)}${'☆'.repeat(5 - product.rating)}</p>
+                <div class="btns">
+                  <button class="cart-btn">Add to Cart</button>
+                  <button class="review-btn">Review</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (page === 'users') {
+        content.innerHTML = `
+          <div class="header">
+            <h1>User Management</h1>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+              <tr style="background: var(--primary-color); color: var(--text-color-light);">
+                <th style="padding: 12px; border-radius: 8px 0 0 8px;">Photo</th>
+                <th style="padding: 12px;">Name</th>
+                <th style="padding: 12px;">Role</th>
+                <th style="padding: 12px; border-radius: 0 8px 8px 0;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${generateUserRow("John Doe", "Reviewer", "https://randomuser.me/api/portraits/men/75.jpg")}
+              ${generateUserRow("Jane Smith", "Verified Buyer", "https://randomuser.me/api/portraits/women/65.jpg")}
+              ${generateUserRow("Admin User", "Admin", "https://randomuser.me/api/portraits/men/32.jpg")}
+              ${generateUserRow("Alice", "Buyer", "https://randomuser.me/api/portraits/men/15.jpg")}
+            </tbody>
+          </table>
+        `;
+      } 
+      else if (page === 'admin') {
+          content.innerHTML = `
+            <div class="header">
+              <h1>Admin Login</h1>
+            </div>
+            <form id="reviewForm" method="POST" action="admin">           
+              <label for="uname">Username : </label>
+              <input type="text" id="uname" name="uname" min="1" max="5" required />
+              <label for="rating">Password :</label>
+              <input type="password" id="pword" name="pword" min="1" max="5" required />
+              <button type="submit">Submit</button>
+            </form>
+          `;
+        }
+      else if (page === 'settings') {
+    	  
+        content.innerHTML = `
+          <div class="header">
+            <h1>Settings ⚙️</h1>
+          </div>
+          <div class="settings-container fade-in">
+            <div class="settings-dropdown">
+              <button class="dropdown-header" onclick="toggleDropdown(this)">
+                🎨 Appearance
+                <span>&#9660;</span>
+              </button>
+              <div class="dropdown-body">
+                <label>Theme:
+                  <select onchange="changeTheme(this.value)">
+                    <option>Light</option>
+                    <option>Dark</option>
+                  </select>
+                </label>
+                <label>Font Size:
+                  <input type="range" min="12" max="24" value="16" />
+                </label>
+              </div>
+            </div>
+            <div class="settings-dropdown">
+              <button class="dropdown-header" onclick="toggleDropdown(this)">
+                👤 Account
+                <span>&#9660;</span>
+              </button>
+              <div class="dropdown-body">
+                <label>Username:
+                  <input type="text" placeholder="New username" />
+                </label>
+                <label>Password:
+                  <input type="password" placeholder="New password" />
+                </label>
+                <button class="animated-btn">Update Profile</button>
+              </div>
+            </div>
+            <div class="settings-dropdown">
+              <button class="dropdown-header" onclick="toggleDropdown(this)">
+                🔧 Preferences
+                <span>&#9660;</span>
+              </button>
+              <div class="dropdown-body">
+                <label>Notifications:
+                  <input type="checkbox" checked />
+                </label>
+                <label>Auto Backup:
+                  <input type="checkbox" />
+                </label>
+                <label>Language:
+                  <select>
+                    <option>English</option>
+                    <option>Telugu</option>
+                    <option>Hindi</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      content.classList.remove("fadeIn"); // Remove class for the next animation
+    }
+
+    function toggleDropdown(header) {
+      const dropdown = header.parentNode;
+      const body = header.nextElementSibling;
+      const span = header.querySelector('span');
+      const isActive = header.classList.contains('active');
+
+      if (isActive) {
+        header.classList.remove('active');
+        body.style.maxHeight = null;
+        span.innerHTML = '&#9660;';
+      } else {
+        header.classList.add('active');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        span.innerHTML = '&#9650;';
+      }
+    }
+
+    function editUser(name) {
+      alert("Editing user: " + name);
+    }
+
+    function deleteUser(name) {
+      if (confirm("Are you sure you want to delete " + name + "?")) {
+        alert(name + " has been deleted.");
+        // Implement actual delete logic here
+      }
+    }
+
+    // Attach event listeners for product buttons after the content is loaded
+    function attachProductButtonListeners() {
+      document.querySelectorAll('.cart-btn').forEach((button, index) => {
+        button.addEventListener('click', () => {
+          console.log('Added to Cart:', index); // Replace with actual cart logic
+        });
+      });
+
+      document.querySelectorAll('.review-btn').forEach((button, index) => {
+    	    button.addEventListener('click', () => {
+    	      console.log('Navigating to Review section for product:', index);
+    	      showPage('reviews');
+    	    });
+    	  });
+    	}
+    // Call attachProductButtonListeners whenever products page is loaded
+    const originalShowPage = showPage;
+    showPage = function(page) {
+      originalShowPage(page);
+      if (page === 'products') {
+        setTimeout(attachProductButtonListeners, 100); // Ensure elements are rendered
+      }
+    };
+
+    loadPage('dashboard'); // to load default section
+    document.querySelectorAll('.nav-link').forEach(link => {
+    	  link.addEventListener('click', e => {
+    	    e.preventDefault();
+    	    document.body.style.opacity = 0;
+    	    setTimeout(() => {
+    	      window.location = link.href;
+    	    }, 300);
+    	  });
+    	});
+    
+  </script>
+</body>
+</html>

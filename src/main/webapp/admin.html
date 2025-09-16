@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2c3e50;
+      --secondary-light: #34495e;
+      --accent: #e74c3c;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --info: #1abc9c;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #f5f7fa;
+    }
+
+    /* Floating Particle Background */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='3' fill='%23ffffff10'/%3E%3Ccircle cx='150' cy='150' r='2' fill='%23ffffff08'/%3E%3Ccircle cx='250' cy='50' r='4' fill='%23ffffff15'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      animation: particle-move 20s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes particle-move {
+      from { background-position: 0 0; }
+      to { background-position: 200px 200px; }
+    }
+
+    /* Gradient Morph Background */
+    body {
+      background: linear-gradient(-45deg, #2c3e50, #3498db, #2ecc71, #e74c3c);
+      background-size: 400% 400%;
+      animation: gradient-morph 15s ease infinite;
+    }
+
+    @keyframes gradient-morph {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+      color: var(--white);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      transform: translateX(-100%);
+      animation: slideInLeft 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+    
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.05));
+      z-index: -1;
+    }
+    
+    .sidebar h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    
+    .sidebar h2::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+    
+    .sidebar:hover h2::after {
+      width: 100px;
+    }
+    
+    .sidebar a {
+      color: var(--light);
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 8px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+      font-weight: 500;
+    }
+    
+    .sidebar a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: 0.6s;
+    }
+    
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .sidebar a:hover::before {
+      left: 100%;
+    }
+    
+    .sidebar a i {
+      width: 20px;
+      text-align: center;
+    }
+    
+    .sidebar .active {
+      background: rgba(52, 152, 219, 0.2);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    /* Main Content Styles */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: rgba(255, 255, 255, 0.9);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Header Styles with Neon Glow */
+    .header {
+      background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+      color: var(--white);
+      padding: 20px 30px;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 5;
+      transform: translateY(-100%);
+      animation: slideInDown 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards;
+    }
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--info), var(--success));
+      background-size: 200% 100%;
+      animation: gradientFlow 3s ease infinite;
+    }
+    
+    /* Neon Glow Effect */
+    .header h1 {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .header h1::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #4A90E2, #2ecc71, #e74c3c);
+      mix-blend-mode: screen;
+      opacity: 0.3;
+      z-index: -1;
+      animation: neon-glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes neon-glow {
+      from { filter: blur(5px) brightness(1); }
+      to { filter: blur(10px) brightness(1.5); }
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .user-avatar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(transparent, rgba(255, 255, 255, 0.3), transparent);
+      transform: rotate(45deg);
+      transition: var(--transition);
+    }
+    
+    .user-avatar:hover {
+      transform: scale(1.1);
+    }
+    
+    .user-avatar:hover::before {
+      left: 100%;
+    }
+    
+    /* Table Styles */
+    .content {
+      padding: 30px;
+      overflow-y: auto;
+      height: 100%;
+    }
+    
+    .table-container {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: fadeIn 0.8s ease;
+      position: relative;
+    }
+    
+    /* Holographic Effect for Table Container */
+    .table-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, 
+        transparent 25%,
+        rgba(255,255,255,0.1) 50%,
+        transparent 75%);
+      animation: hologram 6s infinite linear;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    
+    @keyframes hologram {
+      0% { transform: translate(-25%, -25%) rotate(45deg); }
+      100% { transform: translate(25%, 25%) rotate(45deg); }
+    }
+    
+    .table-header {
+      padding: 20px 25px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .table-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .search-box {
+      position: relative;
+      width: 250px;
+    }
+    
+    /* Advanced Input Effects */
+    .search-box input {
+      width: 100%;
+      padding: 8px 15px 8px 35px;
+      border-radius: 20px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--white);
+      transition: var(--transition);
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-image: linear-gradient(45deg, #4A90E2, #2ecc71) 1;
+      box-shadow: 0 0 15px rgba(74,144,226,0.3);
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--white);
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table thead tr {
+      background: #f8f9fa;
+    }
+    
+    .data-table th {
+      padding: 15px 20px;
+      text-align: left;
+      color: var(--secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      position: relative;
+    }
+    
+    .data-table th::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+    }
+    
+    .data-table th:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .data-table tbody tr {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+    
+    .data-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    
+    /* Interactive Table Rows */
+    .data-table tbody tr:hover {
+      background: rgba(52, 152, 219, 0.05);
+      transform: scale(1.01);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .data-table tbody tr:hover::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.05),
+        transparent);
+      pointer-events: none;
+    }
+    
+    .data-table td {
+      padding: 15px 20px;
+      color: var(--dark);
+      font-size: 14px;
+    }
+    
+    .rating {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .rating-5 {
+      background: rgba(46, 204, 113, 0.1);
+      color: var(--success);
+    }
+    
+    .rating-4 {
+      background: rgba(46, 204, 113, 0.1);
+      color: var(--success);
+    }
+    
+    .rating-3 {
+      background: rgba(241, 196, 15, 0.1);
+      color: var(--warning);
+    }
+    
+    .rating-2 {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--accent);
+    }
+    
+    .rating-1 {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--accent);
+    }
+    
+    /* Advanced Button Effects */
+    .action-btn {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
+      background: rgba(52, 152, 219, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 12px;
+      margin-right: 5px;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+    
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.2),
+        transparent);
+      transition: 0.6s;
+    }
+    
+    .action-btn:hover {
+      background: var(--primary);
+      color: var(--white);
+      transform: translateY(-2px) rotateX(10deg);
+    }
+    
+    .action-btn:hover::before {
+      left: 100%;
+    }
+    
+    .action-btn.delete {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--accent);
+    }
+    
+    .action-btn.delete:hover {
+      background: var(--accent);
+      color: var(--white);
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .page-info {
+      color: var(--gray);
+      font-size: 14px;
+    }
+    
+    .page-controls {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .page-btn {
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: var(--dark);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .page-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.2),
+        transparent);
+      transition: 0.6s;
+    }
+    
+    .page-btn:hover {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+    
+    .page-btn:hover::before {
+      left: 100%;
+    }
+    
+    .page-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, var(--primary), var(--info));
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(45deg, var(--primary-dark), var(--info));
+    }
+    
+    /* Loading Skeleton Animation */
+    .skeleton {
+      animation: skeleton-loading 1.5s infinite linear;
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.1) 25%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0.1) 75%
+      );
+      background-size: 200% 100%;
+    }
+    
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Preloader Animation */
+    .preloader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: preloader-spin 1s linear infinite;
+      z-index: 1000;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+    
+    @keyframes preloader-spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Staggered Animations */
+    .data-table tbody tr {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s forwards;
+    }
+    
+    .data-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .data-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+    .data-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+    .data-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+    .data-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+    .data-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
+    .data-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
+    .data-table tbody tr:nth-child(8) { animation-delay: 0.8s; }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Animations */
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideInDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+      }
+      
+      .sidebar h2 span, .sidebar a span {
+        display: none;
+      }
+      
+      .sidebar a {
+        justify-content: center;
+        padding: 15px 0;
+      }
+      
+      .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .search-box {
+        width: 100%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="sidebar">
+    <h2><i class="fas fa-tachometer-alt"></i> <span>Admin Panel</span></h2>
+    <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+    <a href="#"><i class="fas fa-users"></i> <span>Users</span></a>
+    <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
+    <a href="#"><i class="fas fa-chart-bar"></i> <span>Reports</span></a>
+    <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div>Welcome, <span style="color: var(--primary);">Admin</span></div>
+      <div class="user-profile">
+        <div class="user-avatar">
+          A
+        </div>
+      </div>
+    </div>
+    
+    <div class="content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3><i class="fas fa-star"></i> Product Reviews</h3>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search reviews..." id="searchInput">
+          </div>
+        </div>
+        
+        <table class="data-table" id="reviewsTable">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Rating</th>
+              <th>Review</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviewsTableBody">
+            <!-- Reviews will be loaded here via JavaScript -->
+          </tbody>
+        </table>
+        
+        <div class="pagination">
+          <div class="page-info" id="pageInfo">Loading reviews...</div>
+          <div class="page-controls">
+            <button class="page-btn" id="prevPage"><i class="fas fa-angle-left"></i></button>
+            <button class="page-btn active" id="page1">1</button>
+            <button class="page-btn" id="page2">2</button>
+            <button class="page-btn" id="nextPage"><i class="fas fa-angle-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="preloader"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const preloader = document.querySelector('.preloader');
+      const reviewsTableBody = document.getElementById('reviewsTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      // Current page state
+      let currentPage = 1;
+      const reviewsPerPage = 8;
+      let allReviews = [];
+      let filteredReviews = [];
+
+      // Show loader function
+      function showLoader() {
+        preloader.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+      
+      // Hide loader function
+      function hideLoader() {
+        preloader.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      // Fetch reviews from server
+      function fetchReviews() {
+        showLoader();
+        
+        // In a real application, this would fetch from your servlet
+        // For now, we'll use the sample data you provided
+        setTimeout(() => {
+          allReviews = [
+            { p_name: 'samsungS22', rating: 4, review: 'good' },
+            { p_name: 'oneplus11', rating: 5, review: 'gooddd' },
+            { p_name: 'iphone14', rating: 5, review: 'nice' },
+            { p_name: 'oneplus11', rating: 3, review: 'super' },
+            { p_name: 'iphone14', rating: 3, review: 'super' },
+            { p_name: 'iphone14', rating: 3, review: 'good' }
+          ];
+          
+          filteredReviews = [...allReviews];
+          renderReviews();
+          updatePagination();
+          hideLoader();
+        }, 1000);
+      }
+
+      // Render reviews to the table
+      function renderReviews() {
+        reviewsTableBody.innerHTML = '';
+        
+        const startIndex = (currentPage - 1) * reviewsPerPage;
+        const endIndex = startIndex + reviewsPerPage;
+        const reviewsToShow = filteredReviews.slice(startIndex, endIndex);
+        
+        if (reviewsToShow.length === 0) {
+          reviewsTableBody.innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 30px;">
+                No reviews found
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        reviewsToShow.forEach((review, index) => {
+          const row = document.createElement('tr');
+          row.style.animationDelay = `${index * 0.1}s`;
+          
+          row.innerHTML = `
+            <td>${review.p_name}</td>
+            <td><span class="rating rating-${review.rating}">${review.rating} <i class="fas fa-star"></i></span></td>
+            <td>${review.review}</td>
+            <td>
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+            </td>
+          `;
+          
+          reviewsTableBody.appendChild(row);
+        });
+        
+        // Update page info
+        pageInfo.textContent = `Showing ${startIndex + 1} to ${Math.min(startIndex + reviewsPerPage, filteredReviews.length)} of ${filteredReviews.length} reviews`;
+      }
+
+      // Update pagination controls
+      function updatePagination() {
+        const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        
+        // Reset all buttons
+        document.querySelectorAll('.page-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Update active page
+        if (currentPage <= 2) {
+          page1.textContent = '1';
+          page2.textContent = '2';
+          
+          if (currentPage === 1) {
+            page1.classList.add('active');
+          } else {
+            page2.classList.add('active');
+          }
+        } else {
+          page1.textContent = currentPage - 1;
+          page2.textContent = currentPage;
+          page2.classList.add('active');
+        }
+        
+        // Disable prev/next buttons when appropriate
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages;
+      }
+
+      // Search functionality
+      searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        if (searchTerm === '') {
+          filteredReviews = [...allReviews];
+        } else {
+          filteredReviews = allReviews.filter(review => 
+            review.p_name.toLowerCase().includes(searchTerm) || 
+            review.review.toLowerCase().includes(searchTerm)
+          );
+        }
+        
+        currentPage = 1;
+        renderReviews();
+        updatePagination();
+      });
+
+      // Pagination controls
+      document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderReviews();
+          updatePagination();
+        }
+      });
+
+      document.getElementById('nextPage').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderReviews();
+          updatePagination();
+        }
+      });
+
+      document.getElementById('page1').addEventListener('click', () => {
+        const page1 = document.getElementById('page1');
+        currentPage = parseInt(page1.textContent);
+        renderReviews();
+        updatePagination();
+      });
+
+      document.getElementById('page2').addEventListener('click', () => {
+        const page2 = document.getElementById('page2');
+        currentPage = parseInt(page2.textContent);
+        renderReviews();
+        updatePagination();
+      });
+
+      // Initialize the page
+      fetchReviews();
+
+      // Add click handlers for sidebar links to show loader
+      document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          showLoader();
+          setTimeout(() => {
+            // Here you would normally load new content
+            hideLoader();
+          }, 800);
+        });
+      });
+
+      // Enhanced button effects
+      document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('mousedown', () => {
+          button.style.transform = 'translateY(1px)';
+        });
+        button.addEventListener('mouseup', () => {
+          button.style.transform = '';
+        });
+        button.addEventListener('mouseleave', () => {
+          button.style.transform = '';
+        });
+      });
+
+      // Add floating animation to header
+      const headerTitle = document.querySelector('.header div:first-child');
+      headerTitle.style.animation = 'float 3s ease-in-out infinite';
+
+      // Add 3D tilt effect to table container
+      const tableContainer = document.querySelector('.table-container');
+      tableContainer.addEventListener('mousemove', (e) => {
+        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+        tableContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+      });
+
+      tableContainer.addEventListener('mouseenter', () => {
+        tableContainer.style.transition = 'all 0.1s ease';
+      });
+
+      tableContainer.addEventListener('mouseleave', () => {
+        tableContainer.style.transition = 'all 0.5s ease';
+        tableContainer.style.transform = 'rotateY(0deg) rotateX(0deg)';
+      });
+    });
+    
+ // Auto-refresh every 30 seconds
+    setInterval(fetchReviews, 30000);
+
+    // Add refresh button to table header
+    const refreshBtn = document.createElement('button');
+    refreshBtn.innerHTML = '<i class="fas fa-sync"></i>';
+    refreshBtn.className = 'action-btn';
+    refreshBtn.onclick = fetchReviews;
+    document.querySelector('.table-header').appendChild(refreshBtn);
+    
+    function fetchReviews() {
+        showLoader();
+        fetch('reviews?' + new Date().getTime()) // Cache busting
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                allReviews = data;
+                renderReviews();
+                updatePagination();
+                hideLoader();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                hideLoader();
+                alert('Error loading reviews: ' + error.message);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.querySelector('.preloader');
+        const reviewsTableBody = document.getElementById('reviewsTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const pageInfo = document.getElementById('pageInfo');
+        
+        let currentPage = 1;
+        const reviewsPerPage = 8;
+        let allReviews = [];
+        let filteredReviews = [];
+
+        // Enhanced fetch with error handling
+        function fetchReviews() {
+            showLoader();
+            fetch('reviews?t=' + new Date().getTime()) // Cache busting
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    allReviews = data;
+                    filteredReviews = [...allReviews];
+                    renderReviews();
+                    updatePagination();
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    showError('Failed to load reviews. Please try again.');
+                })
+                .finally(() => hideLoader());
+        }
+
+        function renderReviews() {
+            reviewsTableBody.innerHTML = '';
+            const startIndex = (currentPage - 1) * reviewsPerPage;
+            const paginatedReviews = filteredReviews.slice(startIndex, startIndex + reviewsPerPage);
+
+            if (paginatedReviews.length === 0) {
+                reviewsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="no-results">
+                            <i class="fas fa-exclamation-circle"></i>
+                            No reviews found
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            paginatedReviews.forEach((review, index) => {
+                const row = document.createElement('tr');
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.innerHTML = `
+                    <td>${review.pName}</td>
+                    <td><span class="star-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</span></td>
+                    <td>${review.review}</td>
+                    <td>
+                        <button class="action-btn" onclick="editReview('${review.pName}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteReview('${review.pName}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                reviewsTableBody.appendChild(row);
+            });
+
+            updatePageInfo();
+        }
+
+        function updatePageInfo() {
+            const start = (currentPage - 1) * reviewsPerPage + 1;
+            const end = Math.min(currentPage * reviewsPerPage, filteredReviews.length);
+            pageInfo.textContent = `Showing ${start} to ${end} of ${filteredReviews.length} reviews`;
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+            const pageControls = document.querySelector('.page-controls');
+            pageControls.innerHTML = '';
+
+            // Previous button
+            const prevButton = createPageButton('«', 'prev', currentPage > 1);
+            pageControls.appendChild(prevButton);
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = createPageButton(i, i, true);
+                if (i === currentPage) pageBtn.classList.add('active');
+                pageControls.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextButton = createPageButton('»', 'next', currentPage < totalPages);
+            pageControls.appendChild(nextButton);
+        }
+
+        function createPageButton(text, value, enabled) {
+            const button = document.createElement('button');
+            button.className = `page-btn ${!enabled ? 'disabled' : ''}`;
+            button.textContent = text;
+            button.disabled = !enabled;
+            
+            if (typeof value === 'number') {
+                button.addEventListener('click', () => {
+                    currentPage = value;
+                    renderReviews();
+                    updatePagination();
+                });
+            } else if (value === 'prev') {
+                button.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderReviews();
+                        updatePagination();
+                    }
+                });
+            } else if (value === 'next') {
+                button.addEventListener('click', () => {
+                    if (currentPage < Math.ceil(filteredReviews.length / reviewsPerPage)) {
+                        currentPage++;
+                        renderReviews();
+                        updatePagination();
+                    }
+                });
+            }
+            return button;
+        }
+
+        // Search functionality
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            filteredReviews = allReviews.filter(review => 
+                review.pName.toLowerCase().includes(searchTerm) ||
+                review.review.toLowerCase().includes(searchTerm)
+            );
+            currentPage = 1;
+            renderReviews();
+            updatePagination();
+        });
+
+        // Helper functions
+        function showLoader() {
+            preloader.style.display = 'block';
+            document.body.style.cursor = 'wait';
+        }
+
+        function hideLoader() {
+            preloader.style.display = 'none';
+            document.body.style.cursor = 'default';
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                ${message}
+            `;
+            document.querySelector('.content').prepend(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchReviews, 30000);
+
+        // Initial load
+        fetchReviews();
+    });
+
+    // Global functions for action buttons
+    function editReview(productName) {
+        console.log('Editing:', productName);
+        // Implement edit functionality
+    }
+
+    function deleteReview(productName) {
+        if (confirm(`Delete all reviews for ${productName}?`)) {
+            fetch(`deleteReview?product=${encodeURIComponent(productName)}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) location.reload();
+                else alert('Deletion failed');
+            });
+        }
+    }
+  </script>
+</body>
+</html>
